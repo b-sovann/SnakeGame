@@ -3,6 +3,7 @@ public class Console {
         // this is string
         String name = "raksa";
         System.out.println(name);
+        // hello
     }
 
 }

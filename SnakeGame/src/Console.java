@@ -1,6 +1,7 @@
 public class Console {
     public static void main(String[] args) {
-        System.out.println("Hello WOrld!!");
+        String name = "raksa";
+        System.out.println(name);
     }
 
 }

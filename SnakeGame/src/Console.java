@@ -16,7 +16,7 @@ public class Console {
         Screen screen = null;
         Random random = new Random();
         // 0 left, 1 up, 2 right, 3 down
-        char[] heads = {'<', '^', '>', '+'};
+        char[] heads = {'<', '^', '>', 'v'};
         int direction = 1;
         try {
             Terminal terminal = defaultTerminalFactory.createTerminal();

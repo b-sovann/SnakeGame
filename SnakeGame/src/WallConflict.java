@@ -8,15 +8,16 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
+
 import java.io.IOException;
 import java.util.Random;
 
-public class Wall {
+public class WallConflict {
     static Screen screen = null;
     public static void main(String[] args) {
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
         Screen screen = null;
-        Random random = new Random();
+
         // 0 left, 1 up, 2 right, 3 down
         char[] heads = {'<', '^', '>', 'v'};
         int direction = 1;
@@ -25,46 +26,68 @@ public class Wall {
         try {
             Terminal terminal = defaultTerminalFactory.createTerminal();
             screen = new TerminalScreen(terminal);
-            Wall.screen = screen;
+            WallConflict.screen = screen;
             screen.startScreen();
 
             TerminalSize terminalSize = terminal.getTerminalSize();
 
             int width  = terminalSize.getColumns();
             int height = terminalSize.getRows();
-
+            int[] fruitCoordinate = WallConflict.getFruit(width, height);
 
             while(true) {
                 KeyStroke keyStroke = screen.pollInput();
                 if(keyStroke != null) {
                     if(keyStroke.getKeyType() == KeyType.ArrowLeft) {
                         direction = 0;
-                        Wall.putCharrEmpty(x, y);
+                        WallConflict.putCharrEmpty(x, y);
                         x--;
+                        if (x == fruitCoordinate[0] && y == fruitCoordinate[1]) {
+                            fruitCoordinate = WallConflict.getFruit(width, height);
+                        }
                     }
                     if(keyStroke.getKeyType() == KeyType.ArrowUp) {
                         direction = 1;
-                        Wall.putCharrEmpty(x, y);
+                        WallConflict.putCharrEmpty(x, y);
                         y--;
+                        if (x == fruitCoordinate[0] && y == fruitCoordinate[1]) {
+                            fruitCoordinate = WallConflict.getFruit(width, height);
+                        }
                     }
                     if(keyStroke.getKeyType() == KeyType.ArrowRight) {
                         direction = 2;
-                        Wall.putCharrEmpty(x, y);
+                        WallConflict.putCharrEmpty(x, y);
                         x++;
+                        if (x == fruitCoordinate[0] && y == fruitCoordinate[1]) {
+                            fruitCoordinate = WallConflict.getFruit(width, height);
+                        }
                     }
                     if(keyStroke.getKeyType() == KeyType.ArrowDown) {
                         direction = 3;
-                        Wall.putCharrEmpty(x, y);
+                        WallConflict.putCharrEmpty(x, y);
                         y++;
+                            if (x == fruitCoordinate[0] && y == fruitCoordinate[1]) {
+                                fruitCoordinate = WallConflict.getFruit(width, height);
+                            }
                     }
                 }
 
-                Wall.putCharr(x, y, heads[direction]);
-                Wall.drawWall(width, height);
+                WallConflict.drawWall(width, height);
+                WallConflict.putCharr(x, y, heads[direction]);
+                WallConflict.putCharr( fruitCoordinate[0], fruitCoordinate[1], '@');
+
+
+
+                if (WallConflict.hitWall(x, y, width, height)){
+                    System.out.println("Hit");
+                }
 
                 screen.refresh();
                 Thread.yield();
             }
+
+
+
         }
         catch(IOException e) {
             e.printStackTrace();
@@ -81,10 +104,10 @@ public class Wall {
         }
     }
     private static void putCharrEmpty(int x, int y) {
-        Wall.putCharr(x, y, ' ');
+        WallConflict.putCharr(x, y, ' ');
     }
     private static void putCharr(int x, int y, char c) {
-        Wall.screen.setCharacter(x, y, new TextCharacter(
+        WallConflict.screen.setCharacter(x, y, new TextCharacter(
                             c,
                             TextColor.ANSI.DEFAULT,
                             // This will pick a random background color
@@ -94,16 +117,35 @@ public class Wall {
     private static void drawWall(int width, int height){
 
         for (int i =0; i < width; i++){
-            Wall.putCharr(i, 0, '*');
+            WallConflict.putCharr(i, 0, '*');
         }
         for (int i =0; i < width; i++){
-            Wall.putCharr(i, height-1, '*');
+            WallConflict.putCharr(i, height-1, '*');
         }
         for (int i =0; i < height; i++){
-            Wall.putCharr(0, i, '*');
+            WallConflict.putCharr(0, i, '*');
         }
         for (int i =0; i < height; i++){
-            Wall.putCharr(width-1, i, '*');
+            WallConflict.putCharr(width-1, i, '*');
         }
     }
+
+    private static boolean hitWall(int x, int y, int width, int height){
+        boolean isHit = false;
+        if (x == width-1 || y == height -1 || x == 0 || y == 0)
+            isHit = true;
+        return isHit;
+    }
+
+    private static int[] getFruit(int width, int height){
+        int[] fruit = new int[2];
+        Random random = new Random();
+
+            fruit[0] = random.nextInt(width);
+            fruit[1] = random.nextInt(height);
+        return fruit;
+    }
+
+
+
 }
